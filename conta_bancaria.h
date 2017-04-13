@@ -13,10 +13,11 @@ typedef struct {
 } ContaBancaria;
 
 /*
- * Cria uma nova conta bancaria com o devido número de conta e valor de 
- * saldo.
+ * Cria uma nova conta bancaria com o devido número de conta, valor de 
+ * saldo e nome do titular.
  */
-ContaBancaria* NovaConta(int, double);
+//ContaBancaria* NovaConta(int, double);
+ContaBancaria* NovaConta(int, double, char*);
 
 /* 
  * Faz um deposito e retorna a operação que identifica este deposito

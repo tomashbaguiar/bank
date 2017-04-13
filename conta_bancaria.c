@@ -14,10 +14,13 @@ double TransacaoDeMaiorValor(int n, Transacao extrato[n]) {
     return maiorValor;
 }
 
-ContaBancaria *NovaConta(int num, double saldo) {
-    ContaBancaria *conta = malloc(sizeof(ContaBancaria));
-    conta->numero = num;
-    conta->saldo = saldo;
+//ContaBancaria *NovaConta(int num, double saldo) {
+ContaBancaria *NovaConta(int num, double saldo, char *nome) {
+    ContaBancaria *conta = malloc(sizeof(ContaBancaria));                                   // Aloca espaço na memoria para nova conta.
+    conta->numero = num;                                                                    // Insere o numero da conta.
+    conta->saldo = saldo;                                                                   // Insere o saldo.
+    strcpy(conta->nome, nome);                                                              // Insere o nome do titular da conta.
+
     return conta;
 }
  
