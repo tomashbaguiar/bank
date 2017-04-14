@@ -4,9 +4,10 @@
 #define CONTA_VAZIA -1
 
 typedef struct {
-    int daConta;   //conta que originou a operação
-    int paraConta; //conta receptora da operação
+    int daConta;                                                                            //conta que originou a operação
+    int paraConta;                                                                          //conta receptora da operação
     double valor;
+    time_t tempo;                                                                           // Recebe o tempo de duraçao da operaçao.
 } Transacao;
 
 /*

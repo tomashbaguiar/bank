@@ -9,6 +9,7 @@ typedef Transacao Extrato[TAMANHO_INICIAL];
 typedef struct {
     int numero;
     double saldo;
+    char nome[20];
     Extrato extrato;
 } ContaBancaria;
 
@@ -16,8 +17,7 @@ typedef struct {
  * Cria uma nova conta bancaria com o devido número de conta, valor de 
  * saldo e nome do titular.
  */
-//ContaBancaria* NovaConta(int, double);
-ContaBancaria* NovaConta(int, double, char*);
+ContaBancaria* NovaConta(int, double);
 
 /* 
  * Faz um deposito e retorna a operação que identifica este deposito
@@ -37,5 +37,7 @@ Transacao* Saque(ContaBancaria*, double);
 Transacao* Transferencia(ContaBancaria*, ContaBancaria*, double);
 
 void ImprimeConta(ContaBancaria*);
+
+int existeConta(int, ContaBancaria*, int, int*);
 
 #endif
