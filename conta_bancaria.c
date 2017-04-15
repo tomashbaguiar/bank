@@ -20,6 +20,7 @@ ContaBancaria *NovaConta(int num, double saldo) {
     ContaBancaria *conta = malloc(sizeof(ContaBancaria));                                   // Aloca espaço na memoria para nova conta.
     conta->numero = num;                                                                    // Insere o numero da conta.
     conta->saldo = saldo;                                                                   // Insere o saldo.
+    conta->extrato = criaLista();                                                           // Cria o nó inicial do extrato.
 
     printf("conta criada com sucesso. ");
 
@@ -35,6 +36,8 @@ Transacao* Deposito(ContaBancaria *conta, double valor) {
     transacao->daConta = conta->numero;
     transacao->paraConta = CONTA_VAZIA;
 
+    printf("Valor depositado com sucesso. Saldo é %lf. ", conta->saldo);
+
     return transacao;                                                                       // Retorna a transacao.
 }
  
@@ -47,6 +50,8 @@ Transacao* Saque(ContaBancaria *conta, double valor) {
     transacao->paraConta = CONTA_VAZIA;
     transacao->valor = valor;
 
+    printf("Saque realizado com sucesso. Saldo é %lf. ", conta->saldo);
+
     return transacao;                                                                       // Retorna a transação.
 }
 
@@ -56,11 +61,15 @@ Transacao
     ContaDe->saldo -= valor;                                                                // Decrementa saldo de transferido de.
     ContaPara->saldo += valor;                                                              // Incrementa saldo de transferido para.
 
+    printf("ContaDe %d, ContaPara %d.\n", ContaDe->numero, ContaPara->numero);
+
     Transacao *transacao = malloc(sizeof(Transacao));                                       // Aloca espaço para transacao.
     // Insere valores na TAD da transacao
     transacao->daConta = ContaDe->numero;
     transacao->paraConta = ContaPara->numero;
     transacao->valor = valor;
+
+    printf("Transferência realizada com sucesso. SaldoDe %lf. SaldoPara %lf. ", ContaDe->saldo, ContaPara->saldo);
 
     return transacao;                                                                       // Retorna transacao.
 }
@@ -73,9 +82,10 @@ void Imprime(ContaBancaria *conta) {
 int
 existeConta(int n, ContaBancaria *contas, int numero, int *posicao)
 {
-    for(*posicao = 0; *posicao < n; (*posicao)++)                     // Verifica numero no vetor.
+    for(*posicao = 0; *posicao < n; (*posicao)++)                                           // Verifica numero no vetor.
         if(contas[*posicao].numero == numero)
             break;
 
-    return !(*posicao == n);                                                                 // Se pos = n, não existe a conta.
+    return !(*posicao == n);                                                                // Se pos = n, não existe a conta.
 }
+

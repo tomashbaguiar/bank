@@ -3,6 +3,8 @@
 
 #define CONTA_VAZIA -1
 
+#include <time.h>
+
 typedef struct {
     int daConta;                                                                            //conta que originou a operação
     int paraConta;                                                                          //conta receptora da operação

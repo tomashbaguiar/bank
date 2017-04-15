@@ -26,9 +26,10 @@ int main(void)
 
     Transacao *transacao;                                                                   // TAD auxiliar para guardar informaçoes sobre transaçoes.
 
-    Extrato *banco = malloc(INI_CLI * sizeof(Extrato));                                     // Extrato geral do banco que guarda transaçoes por tempo.
+    //Extrato *banco = malloc(INI_CLI * sizeof(Extrato));                                     // Extrato geral do banco que guarda transaçoes por tempo.
+    Node *extBanco = criaLista();                                                           // Nó inicial do extrato do banco.
 
-    /*  Implementaçao do menu inicial   */
+    //  Implementaçao do menu inicial   //
     do  {
 
         int posicao = 0;
@@ -49,6 +50,7 @@ int main(void)
         switch(opcao)   {
             case 0:                                                                         // Sai do menu e do programa.
                 printf("Operação encerrada.\n");
+                imprimeLista(contas[0].extrato);
                 return 0;
 
             // Criacao de conta
@@ -67,6 +69,7 @@ int main(void)
 
                 ContaBancaria *conta_aux = NovaConta(daConta, 0.0);                         // Cria nova conta.
                 contas[posicao] = *conta_aux;
+                contas[posicao].extrato = criaLista();
                 ncontas++;                                                                  // Incrementa o numero de contas.
                 fim = time(NULL);
                 break;
@@ -88,16 +91,19 @@ int main(void)
                 transacao = Deposito(&contas[posicao], valor);                               // Coloca deposito em transacao.
 
                 //  Coloca ordenado por valor a transacao no extrato da conta
-               
+                insereNodeValor(transacao, contas[posicao].extrato); 
+              
                 fim = time(NULL);
                 //  Coloca ordenado por tempo a transacao no extrato do banco
+                transacao->tempo = fim - inicio;
+                //insereNodeTempo(transacao, extBanco);
                 break;
 
             //  Saque de conta
             case 3:                                                                         
                 printf("Entre com o número da conta (positivo): ");
                 scanf("%d", &daConta);
-                printf("Entre com o valor do depósito: ");
+                printf("Entre com o valor do saque: ");
                 scanf("%lf", &valor);
 
                 inicio = time(NULL);
@@ -110,6 +116,7 @@ int main(void)
                 transacao = Saque(&contas[posicao], valor);                                  // Coloca saque em transacao.
 
                 //  Coloca ordenado por valor a transacao no extrato da conta
+                insereNodeValor(transacao, contas[posicao].extrato); 
                
                 fim = time(NULL);
                 //  Coloca ordenado por tempo a transacao no extrato do banco
@@ -133,7 +140,7 @@ int main(void)
 
                 //  Verifica existencia da conta de destino
                 int posicao2 = CONTA_VAZIA;
-                if(!(existeConta(ncontas, contas, daConta, &posicao2)))  {
+                if(!(existeConta(ncontas, contas, paraConta, &posicao2)))  {
                     printf("Conta não existe.");
                     break;
                 }
@@ -142,7 +149,10 @@ int main(void)
                 Transacao *transacao2 = Inverte(transacao);                                 // Coloca o inverso da transferencia em transacao2.
 
                 //  Coloca ordenado por valor a transacao no extrato da conta remetente
+                insereNodeValor(transacao, contas[posicao].extrato); 
+                
                 //  Coloca ordenado por valor a transacao no extrato da conta de destino
+                insereNodeValor(transacao2, contas[posicao2].extrato); 
                
                 fim = time(NULL);
                 //  Coloca ordenados por tempo as transacoes no extrato do banco
@@ -157,6 +167,8 @@ int main(void)
             printf("Operação durou %ld segundos.\n", (fim - inicio));
 
     }   while(opcao != 0);                                                                  // Loop enquanto o cliente nao sai do menu.
+
+
 
     return 0;
 }

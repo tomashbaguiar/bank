@@ -1,16 +1,17 @@
 #ifndef CONTA_BANCARIA_H
 #define CONTA_BANCARIA_H
 
-#include "transacao.h"
-
 #define TAMANHO_INICIAL 30
-typedef Transacao Extrato[TAMANHO_INICIAL];
+//typedef Transacao Extrato[TAMANHO_INICIAL];
+//
+#include "lista.h"
 
 typedef struct {
     int numero;
     double saldo;
     char nome[20];
-    Extrato extrato;
+    //Extrato extrato;
+    Node *extrato;
 } ContaBancaria;
 
 /*
