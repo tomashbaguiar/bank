@@ -1,174 +1,115 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "conta_bancaria.h"
 #include "transacao.h"
+#include "comandos.h"
 
-#define INI_CLI 30                                                                          // Numero inicial de clientes.
+#define INI_CLI 50                                                                          // Numero inicial de clientes.
+#define ARQUIVO "cmd.txt"                                                                   // Define o nome do arquivo se simulação.
 
-int main(void) 
+int main(int argc, char **argv) 
 {
-   
+    //  Verifica número de argumentos   //
+    if((argc > 3) || (argc == 2))    {
+        printf("Utilização:\n");
+        printf("\t./banco ou ./banco teste [numero_de_transações]\n");
+        printf("se opção = teste, numero_de_transações > 1\n");
+        return 1;
+    }
+    
+    char *opt = NULL;
+    int n = 0;
+    if(argc == 3)   {
+        opt = argv[1];
+        n = atoi(argv[2]);                                                                  // Recebe o número de transações a serem simuladas.
+    }
+
     unsigned int opcao = 0;
 
-    ContaBancaria *contas = malloc(INI_CLI * sizeof(ContaBancaria));                        // Arranjo que guardara informações das contas.
+    Lista *contas = criaLista();                                                            // Lista que guarda a posicao do primeiro nó de conta.
 
-    for(int i = 0; i < INI_CLI; i++)
-        contas[i].numero = CONTA_VAZIA;
+    FILE *file = NULL;                                                                      // Recebe o arquivo para leitura e escrita.
+    if(argc == 3)   {
+        if(!strcmp("teste", opt))   {
+            file = fopen(ARQUIVO, "w");                                                     // Abre o arquivo para escrita dos comandos.
+            geraComandos(file, n);                                                          // Gera os comandos e escreve no arquivo.
+            fclose(file);                                                                   // Fecha o arquivo.
+            file = fopen(ARQUIVO, "r");
+        }
+    }
 
-    int ncontas = 0;                                                                        // Guarda o numero de contas ativas.
-    //time_t tempo;
-
-    int daConta = CONTA_VAZIA;
-    int paraConta = CONTA_VAZIA;
-    double valor = 0.0;
-
-    Transacao *transacao;                                                                   // TAD auxiliar para guardar informaçoes sobre transaçoes.
-
-    //Extrato *banco = malloc(INI_CLI * sizeof(Extrato));                                     // Extrato geral do banco que guarda transaçoes por tempo.
-    Node *extBanco = criaLista();                                                           // Nó inicial do extrato do banco.
+    char comando[CMD_TAM];
 
     //  Implementaçao do menu inicial   //
     do  {
 
-        int posicao = 0;
         time_t inicio = 0;
         time_t fim = 0;
-
-        printf("MENU INICIAL\t\n");
-        printf("\tDigite a opção desejada:\n");
-        printf("\t\t1 - Criação de conta;\n");
-        printf("\t\t2 - Depósito em conta;\n");
-        printf("\t\t3 - Saque de conta;\n");
-        printf("\t\t4 - Tranferência entre contas;\n");
-        printf("\t\t0 - Sair do menu.\nOpção>> ");
-
-        scanf("%ud", &opcao);                                                               // Recebe a opçao.
+    
+        //  Define qual o tipo de entrada de comandos   //
+        if((file != NULL) && (!feof(file)))    {
+            fgets(comando, CMD_TAM, file);                                                  // Recebe o comando do arquivo.
+            comando[strlen(comando) - 1] = '\0';
+        }
+        else if(argc == 1)
+            recebeComando(comando);                                                         // Recebe o comando do usuário.
+        else    {
+            printf("Argumento errado ou falta de argumento.\n");
+            return 1;
+        }
 
         // Comparar expressao de opcao
-        switch(opcao)   {
-            case 0:                                                                         // Sai do menu e do programa.
-                printf("Operação encerrada.\n");
-                imprimeLista(contas[0].extrato);
-                return 0;
-
+        Comando *cmd = trataComando(comando);
+        opcao = cmd->operacao;
+        switch(cmd->operacao)   {
             // Criacao de conta
             case 1:                                                                         
-                printf("Entre com o número da conta (não negativo): ");
-                scanf("%d", &daConta);
-
-                //printf("Entre com o nome do titular da conta: ");
-
                 inicio = time(NULL);
-                //  Verifica existencia do numero da conta
-                if(existeConta(ncontas, contas, daConta, &posicao))   {                   
-                    printf("Numero de conta ja existente.");
-                    break;
-                }
-
-                ContaBancaria *conta_aux = NovaConta(daConta, 0.0);                         // Cria nova conta.
-                contas[posicao] = *conta_aux;
-                contas[posicao].extrato = criaLista();
-                ncontas++;                                                                  // Incrementa o numero de contas.
+                criarconta(contas, cmd->usuario, cmd->numeroContaDe);                       // Insere nova conta em contas.
                 fim = time(NULL);
                 break;
 
             //  Deposito em conta
             case 2:                                                                         
-                printf("Entre com o número da conta (positivo): ");
-                scanf("%d", &daConta);
-                printf("Entre com o valor do depósito: ");
-                scanf("%lf", &valor);
-
                 inicio = time(NULL);
-                //  Verifica existencia da conta
-                if(!(existeConta(ncontas, contas, daConta, &posicao)))  {
-                    printf("Conta não existe.");
-                    break;
-                }
-
-                transacao = Deposito(&contas[posicao], valor);                               // Coloca deposito em transacao.
-
-                //  Coloca ordenado por valor a transacao no extrato da conta
-                insereNodeValor(transacao, contas[posicao].extrato); 
-              
+                depositoOuSaque(contas, cmd->numeroContaDe, cmd->valor, 0);                 // Deposito em conta.
                 fim = time(NULL);
-                //  Coloca ordenado por tempo a transacao no extrato do banco
-                transacao->tempo = fim - inicio;
-                //insereNodeTempo(transacao, extBanco);
                 break;
 
             //  Saque de conta
             case 3:                                                                         
-                printf("Entre com o número da conta (positivo): ");
-                scanf("%d", &daConta);
-                printf("Entre com o valor do saque: ");
-                scanf("%lf", &valor);
 
                 inicio = time(NULL);
-                //  Verifica existencia da conta
-                if(!(existeConta(ncontas, contas, daConta, &posicao)))  {
-                    printf("Conta não existe.");
-                    break;
-                }
-
-                transacao = Saque(&contas[posicao], valor);                                  // Coloca saque em transacao.
-
-                //  Coloca ordenado por valor a transacao no extrato da conta
-                insereNodeValor(transacao, contas[posicao].extrato); 
-               
+                depositoOuSaque(contas, cmd->numeroContaDe, cmd->valor, 1);                 // Deposito em conta.
                 fim = time(NULL);
-                //  Coloca ordenado por tempo a transacao no extrato do banco
                 break;
 
             //  Transferencia entre contas
             case 4:                                                                         
-                printf("Entre com o número da conta que realiza a transferência: ");
-                scanf("%d", &daConta);
-                printf("Entre com o número da conta de destino: ");
-                scanf("%d", &paraConta);
-                printf("Entre com o valor da transferência: ");
-                scanf("%lf", &valor);
 
                 inicio = time(NULL);
-                //  Verifica existencia da conta remetente
-                if(!(existeConta(ncontas, contas, daConta, &posicao)))  {
-                    printf("Conta não existe.");
-                    break;
-                }
-
-                //  Verifica existencia da conta de destino
-                int posicao2 = CONTA_VAZIA;
-                if(!(existeConta(ncontas, contas, paraConta, &posicao2)))  {
-                    printf("Conta não existe.");
-                    break;
-                }
-               
-                transacao = Transferencia(&contas[posicao], &contas[posicao2], valor);      // Coloca a transferencia em transacao.
-                Transacao *transacao2 = Inverte(transacao);                                 // Coloca o inverso da transferencia em transacao2.
-
-                //  Coloca ordenado por valor a transacao no extrato da conta remetente
-                insereNodeValor(transacao, contas[posicao].extrato); 
-                
-                //  Coloca ordenado por valor a transacao no extrato da conta de destino
-                insereNodeValor(transacao2, contas[posicao2].extrato); 
-               
+                transferencia(contas, cmd->numeroContaDe, cmd->numeroContaPara, cmd->valor);
                 fim = time(NULL);
-                //  Coloca ordenados por tempo as transacoes no extrato do banco
+                break;
 
-                break;
-            default:                                                                        // Erro de escolha de opcao.
-                printf("Opção inválida!!!\n\tEntre com um valor entre 0 e 4.\n");
-                break;
+            //  Listar extrato de uma conta
+            case 5:
+
+                inicio = time(NULL);
+                imprimeExtrato(contas, cmd->numeroContaDe, cmd->numeroContaPara); 
+                fim = time(NULL);
         }
 
-        if((opcao == 1) || (opcao == 2) || (opcao == 3) || (opcao == 4))
+        if((cmd->operacao == 1) || (cmd->operacao == 2) || 
+                (cmd->operacao == 3) || (cmd->operacao == 4) || (cmd->operacao == 5))
             printf("Operação durou %ld segundos.\n", (fim - inicio));
-
     }   while(opcao != 0);                                                                  // Loop enquanto o cliente nao sai do menu.
 
-
+    if(file != NULL)
+        fclose(file);    
 
     return 0;
 }

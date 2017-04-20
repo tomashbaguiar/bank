@@ -5,6 +5,7 @@
 
 #include "conta_bancaria.h"
 #include "transacao.h"
+#include "comandos.h"
 
 double TransacaoDeMaiorValor(int n, Transacao extrato[n]) {
     double maiorValor = extrato[0].valor;
@@ -20,7 +21,7 @@ ContaBancaria *NovaConta(int num, double saldo) {
     ContaBancaria *conta = malloc(sizeof(ContaBancaria));                                   // Aloca espaço na memoria para nova conta.
     conta->numero = num;                                                                    // Insere o numero da conta.
     conta->saldo = saldo;                                                                   // Insere o saldo.
-    conta->extrato = criaLista();                                                           // Cria o nó inicial do extrato.
+    conta->extrato = criaExtrato();                                                         // Cria o nó inicial do extrato.
 
     printf("conta criada com sucesso. ");
 
@@ -74,18 +75,53 @@ Transacao
     return transacao;                                                                       // Retorna transacao.
 }
  
-void Imprime(ContaBancaria *conta) {
+void ImprimeConta(ContaBancaria *conta) {
     printf("Numero: %d\n", conta->numero);
-    printf("Saldo: %f\n", conta->saldo);
+    printf("Saldo: %lf\n", conta->saldo);
 }
 
 int
-existeConta(int n, ContaBancaria *contas, int numero, int *posicao)
+existeConta(Lista *contas, const int numero, Lista **posicao)
 {
-    for(*posicao = 0; *posicao < n; (*posicao)++)                                           // Verifica numero no vetor.
-        if(contas[*posicao].numero == numero)
+    Lista *aux = contas;
+    int achou = 0;
+    while(aux != NULL)  {
+        if(aux->conta.numero == numero) {
+            achou = 1;
             break;
+        }
+        aux = aux->proximo;
+    }
+    *posicao = aux;
 
-    return !(*posicao == n);                                                                // Se pos = n, não existe a conta.
+    return achou;
+}
+
+Lista*
+criaLista()
+{
+    Lista *lista = malloc(sizeof(Lista));
+    lista->anterior = NULL;
+    lista->proximo = NULL;
+    lista->conta.numero = CONTA_VAZIA;
+
+    return lista;
+}
+
+void
+insereLista(Lista *lista, ContaBancaria *conta)
+{
+    Lista *nova = (Lista *) malloc(sizeof(Lista));
+    nova->conta = *conta;
+    nova->proximo = NULL;
+    nova->anterior = NULL;
+
+    Lista *aux = lista;
+    while(aux->proximo != NULL)
+        aux = aux->proximo;
+
+    nova->proximo = aux->proximo;
+    nova->anterior = aux;
+    aux->proximo = nova;
 }
 

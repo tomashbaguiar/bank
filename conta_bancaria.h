@@ -4,7 +4,7 @@
 #define TAMANHO_INICIAL 30
 //typedef Transacao Extrato[TAMANHO_INICIAL];
 //
-#include "lista.h"
+#include "transacao.h"
 
 typedef struct {
     int numero;
@@ -13,6 +13,13 @@ typedef struct {
     //Extrato extrato;
     Node *extrato;
 } ContaBancaria;
+
+typedef struct lista    {
+    struct lista *anterior;
+    ContaBancaria conta;
+    struct lista *proximo;
+}
+Lista;
 
 /*
  * Cria uma nova conta bancaria com o devido número de conta, valor de 
@@ -39,6 +46,17 @@ Transacao* Transferencia(ContaBancaria*, ContaBancaria*, double);
 
 void ImprimeConta(ContaBancaria*);
 
-int existeConta(int, ContaBancaria*, int, int*);
+//int existeConta(int, ContaBancaria*, int, unsigned int*);
+int existeConta(Lista*, const int, Lista**);
+
+/*
+ * Cria nova lista
+ */
+Lista *criaLista();
+
+/*
+ * Insere nó na lista
+ */
+void insereLista(Lista*, ContaBancaria*);
 
 #endif
