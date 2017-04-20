@@ -33,10 +33,8 @@ void imprimeLista(Node *inicio)
 {
     Node *aux = inicio->proximo;                                                            // Nó auxiliar para receber o inicial.
     do  {
-        printf("%s", ctime(&(aux->transacao.data)));
-        printf("ContaDe: %d - ", aux->transacao.daConta);
-        printf("ContaPara: %d - ", aux->transacao.paraConta);
-        printf("Valor: %lf \n", aux->transacao.valor);
+        printf("%s ", ctime(&(aux->transacao.data)));
+        printf(" %lf\n", aux->transacao.valor);
         aux = aux->proximo;                                                                 // Pula para o próximo nó.
     }   while(aux != NULL);
 }
@@ -97,9 +95,7 @@ insereNodeValor(Node *inicio)
     }
     for(int j = 0; j < i; j++)  {
         printf("%s", ctime(&(lista[j].transacao.data)));
-        printf("ContaDe: %d - ", lista[j].transacao.daConta);
-        printf("ContaPara: %d - ", lista[j].transacao.paraConta);
-        printf("Valor: %lf \n", lista[j].transacao.valor);
+        printf("%lf\n", lista[j].transacao.valor);
     }
 }
 

@@ -46,8 +46,8 @@ int main(int argc, char **argv)
     //  Implementaçao do menu inicial   //
     do  {
 
-        time_t inicio = 0;
-        time_t fim = 0;
+        clock_t inicio = 0;
+        clock_t fim = 0;
     
         //  Define qual o tipo de entrada de comandos   //
         if((file != NULL) && (!feof(file)))    {
@@ -65,51 +65,51 @@ int main(int argc, char **argv)
         Comando *cmd = trataComando(comando);
         opcao = cmd->operacao;
         switch(cmd->operacao)   {
+
             // Criacao de conta
             case 1:                                                                         
-                inicio = time(NULL);
+                inicio = clock();
                 criarconta(contas, cmd->usuario, cmd->numeroContaDe);                       // Insere nova conta em contas.
-                fim = time(NULL);
+                fim = clock();
                 break;
 
             //  Deposito em conta
             case 2:                                                                         
-                inicio = time(NULL);
+                inicio = clock();
                 depositoOuSaque(contas, cmd->numeroContaDe, cmd->valor, 0);                 // Deposito em conta.
-                fim = time(NULL);
+                fim = clock();
                 break;
 
             //  Saque de conta
             case 3:                                                                         
-
-                inicio = time(NULL);
+                inicio = clock();
                 depositoOuSaque(contas, cmd->numeroContaDe, cmd->valor, 1);                 // Deposito em conta.
-                fim = time(NULL);
+                fim = clock();
                 break;
 
             //  Transferencia entre contas
             case 4:                                                                         
-
-                inicio = time(NULL);
-                transferencia(contas, cmd->numeroContaDe, cmd->numeroContaPara, cmd->valor);
-                fim = time(NULL);
+                inicio = clock();
+                transferencia(contas, cmd->numeroContaDe, cmd->numeroContaPara, cmd->valor);// Transferencia entre contas.
+                fim = clock();
                 break;
 
             //  Listar extrato de uma conta
             case 5:
-
-                inicio = time(NULL);
-                imprimeExtrato(contas, cmd->numeroContaDe, cmd->numeroContaPara); 
-                fim = time(NULL);
+                inicio = clock();
+                imprimeExtrato(contas, cmd->numeroContaDe, cmd->numeroContaPara);           // Lista as transacoes no extrato da conta.
+                fim = clock();
+                break;
         }
-
         if((cmd->operacao == 1) || (cmd->operacao == 2) || 
-                (cmd->operacao == 3) || (cmd->operacao == 4) || (cmd->operacao == 5))
-            printf("Operação durou %ld segundos.\n", (fim - inicio));
+                (cmd->operacao == 3) || (cmd->operacao == 4) || (cmd->operacao == 5))   {
+            double tempo = (double) ((fim - inicio) * 1000000.0/CLOCKS_PER_SEC);
+            printf("Operação durou %lf micro segundos.\n", tempo);
+        }
     }   while(opcao != 0);                                                                  // Loop enquanto o cliente nao sai do menu.
 
     if(file != NULL)
-        fclose(file);    
+        fclose(file);                                                                       // Fecha o arquivo. 
 
     return 0;
 }

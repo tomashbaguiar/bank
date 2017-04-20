@@ -62,8 +62,6 @@ Transacao
     ContaDe->saldo -= valor;                                                                // Decrementa saldo de transferido de.
     ContaPara->saldo += valor;                                                              // Incrementa saldo de transferido para.
 
-    printf("ContaDe %d, ContaPara %d.\n", ContaDe->numero, ContaPara->numero);
-
     Transacao *transacao = malloc(sizeof(Transacao));                                       // Aloca espaço para transacao.
     // Insere valores na TAD da transacao
     transacao->daConta = ContaDe->numero;
